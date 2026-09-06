@@ -1,43 +1,71 @@
-## :warning: Please read these instructions carefully and entirely first
-* Clone this repository to your local machine.
-* Use your IDE of choice to complete the assignment.
-* When you have completed the assignment, you need to  push your code to this repository and [mark the assignment as completed by clicking here](https://app.snapcode.review/submission_links/6c3b6cd7-2e9a-4adc-ac3a-0f876d67e6a1).
-* Once you mark it as completed, your access to this repository will be revoked. Please make sure that you have completed the assignment and pushed all code from your local machine to this repository before you click the link.
+# GitHub Gist Service
 
-## Operability Take-Home Exercise
+A small Spring Boot service that returns the publicly available Gists for a GitHub user.
 
-Welcome to the start of our recruitment process for Operability Engineers. It was great to speak to you regarding an opportunity to join the Equal Experts network!
+## Requirements
 
-Please write code to deliver a solution to the problems outlined below.
+- Java 17+
+- Maven 3.6+
+- Docker
 
-We appreciate that your time is valuable and do not expect this exercise to **take more than 90 minutes**. If you think this exercise will take longer than that, I **strongly** encourage you to please get in touch to ask any clarifying questions.
+## Run locally
 
-### Submission guidelines
-**Do**
-- Provide a README file in text or markdown format that documents a concise way to set up and run the provided solution.
-- Take the time to read any applicable API or service docs, it may save you significant effort.
-- Make your solution simple and clear. We aren't looking for overly complex ways to solve the problem since in our experience, simple and clear solutions to problems are generally the most maintainable and extensible solutions.
+Build:
 
-**Don't**
+```bash
+mvn clean package
+```
 
-Expect the reviewer to dedicate a machine to review the test by:
+Run:
 
-- Installing software globally that may conflict with system software
-- Requiring changes to system-wide configurations
-- Providing overly complex solutions that need to spin up a ton of unneeded supporting dependencies. We aspire to keep our dev experiences as simple as possible (but no simpler)!
-- Include identifying information in your submission. We are endeavouring to make our review process anonymous to reduce bias.
+```bash
+java -jar target/gist-service-0.0.1-SNAPSHOT.jar
+```
 
-### Exercise
-If you have any questions on the below exercise, please do get in touch and we’ll answer as soon as possible.
+The service listens on port 8080.
 
-#### Build an API, test it, and package it into a container
-- Build a simple HTTP web server API in any general-purpose programming language[^1] that interacts with the GitHub API and responds to requests on `/<USER>` with a list of the user’s publicly available Gists[^2].
-- Create an automated test to validate that your web server API works. An example user to use as test data is `octocat`.
-- Package the web server API into a docker container that listens for requests on port `8080`. You do not need to publish the resulting container image in any container registry, but we are expecting the Dockerfile in the submission.
-- The solution may optionally provide other functionality (e.g. pagination, caching) but the above **must** be implemented.
+Example:
 
-Best of luck,  
-Equal Experts
-__________________________________________
-[^1]: For example Go, Python or Ruby but not Bash or Powershell.  
-[^2]: https://docs.github.com/en/rest/gists/gists?apiVersion=2022-11-28
+```bash
+curl http://localhost:8080/octocat
+```
+
+The service calls GitHub's public Gist API for the requested user.
+
+## Tests
+
+Run:
+
+```bash
+mvn test
+```
+
+The controller tests mock the GitHub-facing service, so tests do not depend on GitHub being available.
+
+The tests cover a normal response, an empty Gist list, a user not found response and a GitHub availability failure.
+
+## Docker
+
+The Dockerfile uses a multi-stage build. Maven is used only in the build stage and the runtime image contains only the application JAR and Java runtime.
+
+Build:
+
+```bash
+docker build -t gist-service .
+```
+
+Run:
+
+```bash
+docker run --rm -p 8080:8080 gist-service
+```
+
+Then:
+
+```bash
+curl http://localhost:8080/octocat
+```
+
+## Notes
+
+Public GitHub Gists can be read without authentication. For a production deployment I would consider authenticated GitHub API access, since unauthenticated REST API calls are rate limited.
