@@ -1,0 +1,50 @@
+name: gist-service-ci-cd
+
+on: 
+  push:
+    branches: [main, solution]
+  pull_requests:
+    branches: [main]
+
+permissions:
+  id-token: [write]
+
+jobs:
+  test:
+    runs-on: gist-runner #Name to be confirmed based on Github Runner added in Github settings
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v7
+
+    - name: Setup Java and Maven
+      uses: actions/setup-java@v6
+      with:
+        distribution: temurin
+        java-version: '25'
+
+    - name: Test
+      run: mvn clean verify
+
+  build:
+    runs-on: gist-runner
+    needs: test
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v7
+
+    - name: Login to Dockerhub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }} 
+        password: ${{ secrets.DOCKER_PAT_TOKEN }}
+
+
+    - name: Docker Build
+      run: docker build -t prakhar197/ee-assignment:$(git rev-parse --short HEAD) .
+
+    - name: Docker Push
+      run: docker push prakhar197/ee-assignment:$(git rev-parse --short HEAD)
+
+  # deploy:
