@@ -6,8 +6,8 @@ on:
   # pull_requests:
   #   branches: [main]
 
-permissions:
-  id-token: [write]
+# permissions:
+#   id-token: [write]
 
 jobs:
   test:
