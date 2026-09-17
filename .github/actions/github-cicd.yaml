@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   test:
-    runs-on: gist-runner #Name to be confirmed based on Github Runner added in Github settings
+    runs-on: ubuntu-latest #Name to be confirmed based on Github Runner added in Github settings
 
     steps:
     - name: Checkout
@@ -27,7 +27,7 @@ jobs:
       run: mvn clean verify
 
   build:
-    runs-on: gist-runner
+    runs-on: ubuntu-latest
     needs: test
     
     steps:
