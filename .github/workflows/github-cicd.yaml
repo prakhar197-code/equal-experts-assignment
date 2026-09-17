@@ -3,8 +3,8 @@ name: gist-service-ci-cd
 on: 
   push:
     branches: [main, solution]
-  pull_requests:
-    branches: [main]
+  # pull_requests:
+  #   branches: [main]
 
 permissions:
   id-token: [write]
